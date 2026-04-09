@@ -12,8 +12,25 @@ import { authMiddleware } from './middlewares/auth';
 
 const app = express();
 
+// CORS Configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://clube-estrelinhas-frontend.vercel.app',
+  process.env.FRONTEND_URL?.replace(/\/$/, '') // Add env URL and remove trailing slash if present
+].filter(Boolean) as string[];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());

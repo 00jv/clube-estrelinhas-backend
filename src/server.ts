@@ -1,7 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import 'dotenv/config';
 
 import { productsRoutes } from './routes/products.routes';
 import { ordersRoutes } from './routes/orders.routes';
@@ -12,44 +12,50 @@ import { authMiddleware } from './middlewares/auth';
 
 const app = express();
 
-// CORS Configuration
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://clube-estrelinhas-frontend.vercel.app',
-  process.env.FRONTEND_URL?.replace(/\/$/, '') // Add env URL and remove trailing slash if present
-].filter(Boolean) as string[];
-
-app.use(cors({
+// 1. CORS Configuration (MUST BE FIRST)
+const corsOptions = {
   origin: [
     'https://clube-estrelinhas-frontend.vercel.app',
     'http://localhost:3000',
     process.env.FRONTEND_URL || ''
   ].filter(Boolean),
-  credentials: true
-}));
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
+
+// 2. Body Parser
 app.use(express.json());
 
-// Serve uploaded images as static files
+// 3. Static Files
 app.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads')));
 
-// Public routes
+// 4. Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
-
-// Protected routes (require JWT)
 app.use('/api/orders', ordersRoutes);
 app.use('/api/dashboard', authMiddleware, dashboardRoutes);
 app.use('/api/upload', authMiddleware, uploadRoutes);
 
-// Generic error handler
+// 5. Health Check (for testing)
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// 6. Generic error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err);
-  res.status(500).json({ error: 'Erro interno no servidor' });
+  console.error('SERVER ERROR:', err);
+  res.status(500).json({ 
+    error: 'Erro interno no servidor',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined 
+  });
 });
 
 const PORT = process.env.PORT || 3333;
 
-// Only start the listener if not running in a serverless environment (like Vercel)
 if (process.env.NODE_ENV !== 'production' || process.env.RENDER) {
   app.listen(PORT, () => {
     console.log(`🚀 Server started on port ${PORT}`);

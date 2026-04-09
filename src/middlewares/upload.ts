@@ -3,10 +3,14 @@ import path from 'path';
 import crypto from 'crypto';
 import fs from 'fs';
 
-// Ensure uploads dir exists
+// Ensure uploads dir exists (skip or handle gracefully on Vercel)
 const uploadsDir = path.resolve(__dirname, '..', '..', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+try {
+  if (!process.env.VERCEL && !fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch (error) {
+  console.warn('Could not create uploads directory (expected on Vercel)');
 }
 
 const storage = multer.diskStorage({

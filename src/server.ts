@@ -30,8 +30,19 @@ app.use('/api/orders', ordersRoutes);
 app.use('/api/dashboard', authMiddleware, dashboardRoutes);
 app.use('/api/upload', authMiddleware, uploadRoutes);
 
+// Generic error handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err);
+  res.status(500).json({ error: 'Erro interno no servidor' });
+});
+
 const PORT = process.env.PORT || 3333;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server started on port ${PORT}`);
-});
+// Only start the listener if not running in a serverless environment (like Vercel)
+if (process.env.NODE_ENV !== 'production' || process.env.RENDER) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server started on port ${PORT}`);
+  });
+}
+
+export default app;

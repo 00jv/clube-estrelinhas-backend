@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { OrderController } from '../controllers/OrderController';
 import { authMiddleware } from '../middlewares/auth';
+import { adminMiddleware } from '../middlewares/admin';
 
 const ordersRoutes = Router();
 const orderController = new OrderController();
@@ -38,7 +39,7 @@ ordersRoutes.get('/me', orderController.listMyOrders);
  *       200:
  *         description: Lista de todos os pedidos
  */
-ordersRoutes.get('/', orderController.list);
+ordersRoutes.get('/', adminMiddleware, orderController.list);
 
 /**
  * @swagger
@@ -108,6 +109,6 @@ ordersRoutes.post('/', orderController.create);
  *       200:
  *         description: Status atualizado
  */
-ordersRoutes.put('/:id/status', orderController.updateStatus);
+ordersRoutes.put('/:id/status', adminMiddleware, orderController.updateStatus);
 
 export { ordersRoutes };

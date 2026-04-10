@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { upload } from '../middlewares/upload';
 import { UploadController } from '../controllers/UploadController';
+import { adminMiddleware } from '../middlewares/admin';
 
 const uploadRoutes = Router();
 const uploadController = new UploadController();
@@ -34,6 +35,6 @@ const uploadController = new UploadController();
  *                 url: { type: string }
  *                 public_id: { type: string }
  */
-uploadRoutes.post('/', upload.single('image'), uploadController.uploadImage);
+uploadRoutes.post('/', adminMiddleware, upload.single('image'), uploadController.uploadImage);
 
 export { uploadRoutes };

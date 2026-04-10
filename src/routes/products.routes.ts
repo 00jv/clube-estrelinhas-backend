@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { ProductController } from '../controllers/ProductController';
+import { authMiddleware } from '../middlewares/auth';
+import { adminMiddleware } from '../middlewares/admin';
 
 const productsRoutes = Router();
 const productController = new ProductController();
@@ -88,7 +90,7 @@ productsRoutes.get('/id/:id', productController.getById);
  *       201:
  *         description: Produto criado
  */
-productsRoutes.post('/', productController.create);
+productsRoutes.post('/', authMiddleware, adminMiddleware, productController.create);
 
 /**
  * @swagger
@@ -111,7 +113,7 @@ productsRoutes.post('/', productController.create);
  *       200:
  *         description: Produto atualizado
  */
-productsRoutes.put('/:id', productController.update);
+productsRoutes.put('/:id', authMiddleware, adminMiddleware, productController.update);
 
 /**
  * @swagger
@@ -130,6 +132,6 @@ productsRoutes.put('/:id', productController.update);
  *       204:
  *         description: Produto excluído
  */
-productsRoutes.delete('/:id', productController.delete);
+productsRoutes.delete('/:id', authMiddleware, adminMiddleware, productController.delete);
 
 export { productsRoutes };

@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { DashboardController } from '../controllers/DashboardController';
+import { authMiddleware } from '../middlewares/auth';
+import { adminMiddleware } from '../middlewares/admin';
 
 const dashboardRoutes = Router();
 const dashboardController = new DashboardController();
@@ -25,6 +27,6 @@ const dashboardController = new DashboardController();
  *                 totalCustomers: { type: number }
  *                 totalRevenue: { type: number }
  */
-dashboardRoutes.get('/stats', dashboardController.getStats);
+dashboardRoutes.get('/stats', authMiddleware, adminMiddleware, dashboardController.getStats);
 
 export { dashboardRoutes };

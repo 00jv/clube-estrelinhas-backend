@@ -1,12 +1,12 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Clube Estrelinhas Backend",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r dotenv/config src/server.ts",
-    "start": "node dist/server.js",
-    "build": "prisma generate && prisma db push --accept-data-loss && npx prisma db seed && tsc",
+    "start": "node dist/src/server.js",
+    "build": "prisma generate && tsc && prisma db push --accept-data-loss && npx prisma db seed",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -41,6 +41,6 @@
     "typescript": "^6.0.2"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "node dist/prisma/seed.js"
   }
 }

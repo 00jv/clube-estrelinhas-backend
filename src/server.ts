@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger';
 
 import { productsRoutes } from './routes/products.routes';
 import { ordersRoutes } from './routes/orders.routes';
@@ -25,6 +27,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // 2. Body Parser
 app.use(express.json());
 
@@ -39,6 +45,23 @@ app.use('/api/dashboard', authMiddleware, dashboardRoutes);
 app.use('/api/upload', authMiddleware, uploadRoutes);
 
 // 5. Health Check (for testing)
+/**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: Verificar saúde do servidor
+ *     tags: [Sistema]
+ *     responses:
+ *       200:
+ *         description: Servidor está online
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status: { type: string }
+ *                 timestamp: { type: string }
+ */
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });

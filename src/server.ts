@@ -25,8 +25,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
-
 // 2. Body Parser
 app.use(express.json());
 
